@@ -1,0 +1,9 @@
+{
+  "name": "urban-heat-analysis",
+  "description": "GIS skill for urban-heat-analysis",
+  "version": "0.1.0",
+  "author": "ruiduobao",
+  "skills": [
+    "urban-heat-analysis"
+  ]
+}
