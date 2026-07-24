@@ -1,15 +1,12 @@
 ---
-name: urban-heat-analysis
-display_name: 城市热岛分析工具
-version: 0.1.0
-author: ruiduobao
-license: MIT-0
-description: |
-  Calculate Urban Heat Island (UHI) intensity from MODIS LST GeoTIFF data.
+description: 'Calculate Urban Heat Island (UHI) intensity from MODIS LST GeoTIFF data.
+
   Classify heat island levels, perform temporal analysis, and output UHI maps
+
   with statistics.
-runtime: python>=3.8
-tags: [gis, remote-sensing, uhi, modis, lst, urban-heat-island]
+
+  '
+name: urban-heat-analysis
 ---
 
 # urban-heat-analysis
@@ -221,7 +218,7 @@ plt.savefig("uhi_map.png", dpi=200)
 ### Batch Multi-Date Analysis
 ```bash
 for lst_file in data/MOD11A1*.tif; do
-  python scripts/urban_heat_analysis.py analyze     --input "$lst_file" --rural-fraction 0.1     --output "uhi_$(basename $lst_file)"
+  python scripts\urban-heat-analysis.py analyze     --input "$lst_file" --rural-fraction 0.1     --output "uhi_$(basename $lst_file)"
 done
 ```
 
@@ -242,7 +239,7 @@ jobs:
           python-version: '3.11'
       - run: pip install numpy rasterio
       - run: |
-          python scripts/urban_heat_analysis.py analyze \
+          python scripts\urban-heat-analysis.py analyze \
             --input data/latest_lst.tif \
             --rural-fraction 0.1 \
             --output data/uhi_latest.tif
