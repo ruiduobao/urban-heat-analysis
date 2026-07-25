@@ -27,16 +27,16 @@ Calculate Urban Heat Island (UHI) intensity from MODIS Land Surface Temperature 
 
 ```bash
 # Compute UHI from single LST image
-python urban-heat-analysis.py analyze --lst MOD11A1.tif --output uhi.tif
+python scripts\urban-heat-analysis.py analyze --lst MOD11A1.tif --output uhi.tif
 
 # With rural reference mask
-python urban-heat-analysis.py analyze --lst lst.tif --rural-mask rural.tif --output uhi.tif
+python scripts\urban-heat-analysis.py analyze --lst lst.tif --rural-mask rural.tif --output uhi.tif
 
 # Classify UHI intensity map
-python urban-heat-analysis.py classify --uhi-tif uhi.tif --output classified.tif
+python scripts\urban-heat-analysis.py classify --uhi-tif uhi.tif --output classified.tif
 
 # Temporal analysis across multiple images
-python urban-heat-analysis.py temporal --lst-dir ./lst_data/ --output seasonal.json
+python scripts\urban-heat-analysis.py temporal --lst-dir ./lst_data/ --output seasonal.json
 ```
 
 ## Parameters
@@ -96,7 +96,7 @@ gdalwarp -t_srs EPSG:4326 input.tif reprojected.tif
 Use the QC band (`QC_Day` or `QC_Night`) to filter cloud-contaminated pixels. Pixels with QC flags indicating cloud cover should be masked out before UHI analysis:
 
 ```bash
-python urban-heat-analysis.py analyze --lst MOD11A1.tif --qc-band qc.tif --output uhi.tif
+python scripts\urban-heat-analysis.py analyze --lst MOD11A1.tif --qc-band qc.tif --output uhi.tif
 ```
 
 If QC band is not available, consider using only clear-sky quality flags (QC == 0).
@@ -106,7 +106,7 @@ If QC band is not available, consider using only clear-sky quality flags (QC == 
 For temporal analysis, dates are extracted from filenames using the MODIS naming convention (e.g., `MOD11A1.A2023001.h27v05.061.2023002010234.hdf`). Alternatively, use `--date-format` to specify a custom pattern:
 
 ```bash
-python urban-heat-analysis.py temporal --lst-dir ./lst_data/ --date-format "%Y%m%d" --output seasonal.json
+python scripts\urban-heat-analysis.py temporal --lst-dir ./lst_data/ --date-format "%Y%m%d" --output seasonal.json
 ```
 
 ## Output GeoTIFF Structure
@@ -123,7 +123,7 @@ python urban-heat-analysis.py temporal --lst-dir ./lst_data/ --date-format "%Y%m
 Default classification uses fixed thresholds. To customize:
 
 ```bash
-python urban-heat-analysis.py classify --uhi-tif uhi.tif --thresholds "1.0,2.5,4.0" --output classified.tif
+python scripts\urban-heat-analysis.py classify --uhi-tif uhi.tif --thresholds "1.0,2.5,4.0" --output classified.tif
 ```
 
 The 3 values define boundaries between: none / weak / moderate / strong UHI.
@@ -133,7 +133,7 @@ The 3 values define boundaries between: none / weak / moderate / strong UHI.
 Export classification statistics to CSV:
 
 ```bash
-python urban-heat-analysis.py analyze --lst lst.tif --output uhi.tif --csv-stats stats.csv
+python scripts\urban-heat-analysis.py analyze --lst lst.tif --output uhi.tif --csv-stats stats.csv
 ```
 
 CSV columns: `class, pixel_count, percentage, mean_intensity`.
@@ -143,7 +143,7 @@ CSV columns: `class, pixel_count, percentage, mean_intensity`.
 Combine Terra (MOD) and Aqua (MYD) for same-day average:
 
 ```bash
-python urban-heat-analysis.py combine --terra MOD11A1.tif --aqua MYD11A1.tif --output lst_avg.tif
+python scripts\urban-heat-analysis.py combine --terra MOD11A1.tif --aqua MYD11A1.tif --output lst_avg.tif
 ```
 
 Then run UHI analysis on the averaged LST.
@@ -301,7 +301,7 @@ gdalwarp -t_srs EPSG:4326 input.tif reprojected.tif
 使用 QC 波段（`QC_Day` 或 `QC_Night`）过滤云污染像元。QC 标记为云覆盖的像元应在 UHI 分析前掩膜掉：
 
 ```bash
-python urban-heat-analysis.py analyze --lst MOD11A1.tif --qc-band qc.tif --output uhi.tif
+python scripts\urban-heat-analysis.py analyze --lst MOD11A1.tif --qc-band qc.tif --output uhi.tif
 ```
 
 ## 时序分析日期逻辑
@@ -309,7 +309,7 @@ python urban-heat-analysis.py analyze --lst MOD11A1.tif --qc-band qc.tif --outpu
 时序分析中，日期从文件名按 MODIS 命名约定提取。也可使用 `--date-format` 指定自定义格式：
 
 ```bash
-python urban-heat-analysis.py temporal --lst-dir ./lst_data/ --date-format "%Y%m%d" --output seasonal.json
+python scripts\urban-heat-analysis.py temporal --lst-dir ./lst_data/ --date-format "%Y%m%d" --output seasonal.json
 ```
 
 ## 输出 GeoTIFF 结构
@@ -324,7 +324,7 @@ python urban-heat-analysis.py temporal --lst-dir ./lst_data/ --date-format "%Y%m
 ## 自定义 UHI 阈值
 
 ```bash
-python urban-heat-analysis.py classify --uhi-tif uhi.tif --thresholds "1.0,2.5,4.0" --output classified.tif
+python scripts\urban-heat-analysis.py classify --uhi-tif uhi.tif --thresholds "1.0,2.5,4.0" --output classified.tif
 ```
 
 3 个值定义无/弱/中/强热岛的分界。
@@ -332,7 +332,7 @@ python urban-heat-analysis.py classify --uhi-tif uhi.tif --thresholds "1.0,2.5,4
 ## CSV 统计导出
 
 ```bash
-python urban-heat-analysis.py analyze --lst lst.tif --output uhi.tif --csv-stats stats.csv
+python scripts\urban-heat-analysis.py analyze --lst lst.tif --output uhi.tif --csv-stats stats.csv
 ```
 
 CSV 列：`class, pixel_count, percentage, mean_intensity`。
@@ -342,7 +342,7 @@ CSV 列：`class, pixel_count, percentage, mean_intensity`。
 组合 Terra (MOD) 和 Aqua (MYD) 计算同日平均：
 
 ```bash
-python urban-heat-analysis.py combine --terra MOD11A1.tif --aqua MYD11A1.tif --output lst_avg.tif
+python scripts\urban-heat-analysis.py combine --terra MOD11A1.tif --aqua MYD11A1.tif --output lst_avg.tif
 ```
 
 ## 验证/质量评估
@@ -415,16 +415,16 @@ plt.savefig("uhi_map.png", dpi=200)
 
 ```bash
 # 单期 LST 计算 UHI
-python urban-heat-analysis.py analyze --lst MOD11A1.tif --output uhi.tif
+python scripts\urban-heat-analysis.py analyze --lst MOD11A1.tif --output uhi.tif
 
 # 使用乡村参考掩膜
-python urban-heat-analysis.py analyze --lst lst.tif --rural-mask rural.tif --output uhi.tif
+python scripts\urban-heat-analysis.py analyze --lst lst.tif --rural-mask rural.tif --output uhi.tif
 
 # 热岛分级
-python urban-heat-analysis.py classify --uhi-tif uhi.tif --output classified.tif
+python scripts\urban-heat-analysis.py classify --uhi-tif uhi.tif --output classified.tif
 
 # 时序分析
-python urban-heat-analysis.py temporal --lst-dir ./lst_data/ --output seasonal.json
+python scripts\urban-heat-analysis.py temporal --lst-dir ./lst_data/ --output seasonal.json
 ```
 
 ## 数据来源
