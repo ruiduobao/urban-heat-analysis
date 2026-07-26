@@ -1,0 +1,3 @@
+description: Calculate Urban Heat Island (UHI) intensity from MODIS LST GeoTIFF data
+display_name: Urban Heat Analysis
+name: urban-heat-analysis
