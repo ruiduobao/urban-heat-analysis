@@ -104,5 +104,114 @@ class TestStatistics(unittest.TestCase):
         self.assertAlmostEqual(stats["uhi_intensity"]["max"], np.nanmax(uhi), places=2)
 
 
+class TestFormat(unittest.TestCase):
+    """Tests for --format (csv / json) flag on analyze/temporal/from-place."""
+
+    def test_analyze_subcommand_help_shows_format(self):
+        """`analyze --help` should mention the new --format flag."""
+        import subprocess
+        import sys as _sys
+        result = subprocess.run(
+            [_sys.executable, SCRIPT_PATH, "analyze", "--help"],
+            capture_output=True, text=True, timeout=15,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("--format", result.stdout)
+        self.assertIn("csv", result.stdout)
+        self.assertIn("json", result.stdout)
+
+    def test_temporal_subcommand_help_shows_format(self):
+        """`temporal --help` should mention the new --format flag."""
+        import subprocess
+        import sys as _sys
+        result = subprocess.run(
+            [_sys.executable, SCRIPT_PATH, "temporal", "--help"],
+            capture_output=True, text=True, timeout=15,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("--format", result.stdout)
+        self.assertIn("csv", result.stdout)
+        self.assertIn("json", result.stdout)
+
+    def test_temporal_format_csv(self):
+        """`temporal --format csv` should produce CSV with seasonal rows."""
+        import numpy as np
+        # Build a small fake LST geotiff in a temp dir.
+        # MODIS LST raw values: 0.02 * raw - 273.15 = Celsius.
+        # So 25 °C -> raw = (25 + 273.15) / 0.02 = 14908
+        tmp = tempfile.mkdtemp()
+        lst_path = os.path.join(tmp, "lst.tif")
+        arr = np.full((10, 10), 14908.0, dtype=np.float32)  # ~25 °C
+        arr[2:5, 2:5] = 15108.0  # ~29 °C urban hotspot
+        with uha.rasterio.open(
+            lst_path, "w",
+            driver="GTiff", height=10, width=10, count=1,
+            dtype="float32", crs="EPSG:4326",
+            transform=uha.rasterio.transform.from_bounds(0, 0, 1, 1, 10, 10),
+        ) as dst:
+            dst.write(arr, 1)
+        out_csv = os.path.join(tmp, "temporal.csv")
+        args = uha.argparse.Namespace(
+            lst_dir=tmp, rural_mask=None, output=out_csv,
+            fmt="csv", json=False,
+        )
+        uha.cmd_temporal(args)
+        self.assertTrue(os.path.exists(out_csv))
+        with open(out_csv, "r", encoding="utf-8") as f:
+            text = f.read()
+        # CSV should have season column
+        self.assertIn("season", text)
+
+    def test_temporal_format_json(self):
+        """`temporal --format json` should produce JSON array (default behavior)."""
+        import numpy as np
+        tmp = tempfile.mkdtemp()
+        lst_path = os.path.join(tmp, "lst.tif")
+        arr = np.full((10, 10), 14908.0, dtype=np.float32)  # ~25 °C
+        arr[2:5, 2:5] = 15108.0  # ~29 °C urban hotspot
+        with uha.rasterio.open(
+            lst_path, "w",
+            driver="GTiff", height=10, width=10, count=1,
+            dtype="float32", crs="EPSG:4326",
+            transform=uha.rasterio.transform.from_bounds(0, 0, 1, 1, 10, 10),
+        ) as dst:
+            dst.write(arr, 1)
+        out_json = os.path.join(tmp, "temporal.json")
+        args = uha.argparse.Namespace(
+            lst_dir=tmp, rural_mask=None, output=out_json,
+            fmt="json", json=False,
+        )
+        uha.cmd_temporal(args)
+        self.assertTrue(os.path.exists(out_json))
+        with open(out_json, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        self.assertIsInstance(data, list)
+
+    def test_temporal_format_inferred_from_suffix(self):
+        """When --format not given and output ends with .csv, write CSV."""
+        import numpy as np
+        tmp = tempfile.mkdtemp()
+        lst_path = os.path.join(tmp, "lst.tif")
+        arr = np.full((10, 10), 14908.0, dtype=np.float32)  # ~25 °C
+        arr[2:5, 2:5] = 15108.0  # ~29 °C urban hotspot
+        with uha.rasterio.open(
+            lst_path, "w",
+            driver="GTiff", height=10, width=10, count=1,
+            dtype="float32", crs="EPSG:4326",
+            transform=uha.rasterio.transform.from_bounds(0, 0, 1, 1, 10, 10),
+        ) as dst:
+            dst.write(arr, 1)
+        out_csv = os.path.join(tmp, "inferred.csv")
+        args = uha.argparse.Namespace(
+            lst_dir=tmp, rural_mask=None, output=out_csv,
+            fmt=None, json=False,
+        )
+        uha.cmd_temporal(args)
+        self.assertTrue(os.path.exists(out_csv))
+        with open(out_csv, "r", encoding="utf-8") as f:
+            text = f.read()
+        self.assertIn("season", text)
+
+
 if __name__ == "__main__":
     unittest.main()
