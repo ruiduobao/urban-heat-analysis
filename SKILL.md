@@ -1,12 +1,6 @@
 ---
-description: 'Calculate Urban Heat Island (UHI) intensity from MODIS LST GeoTIFF data.
-
-  Classify heat island levels, perform temporal analysis, and output UHI maps
-
-  with statistics.
-
-  '
 name: urban-heat-analysis
+description: 'Calculate Urban Heat Island (UHI) intensity from MODIS LST GeoTIFF data. description: 'Calculate Urban Heat Island (UHI) intensity from MODIS LST GeoTIFF data.  Classify heat island levels, perform temporal analysis, and output UHI maps  with statistics.  '
 ---
 
 # urban-heat-analysis
@@ -76,8 +70,12 @@ pip install requests>=2.28.0 tqdm numpy scipy rasterio
 
 Obtain MODIS LST data from:
 - **NASA Earthdata Search** (https://search.earthdata.nasa.gov/) — search for MOD11A1 or MYD11A1
-- **NASA LAADS DAAC** (https://ladsweb.modaps.eosdis.nasa.gov/)
-- Requires free Earthdata login (https://urs.earthdata.nasa.gov/)
+- **NASA LAADS DAAC** (https://ladsweb.modaps.eosdis.nasa.gov/) — if downloading the LST GeoTIFFs yourself
+
+> **Note**: this skill itself does not require Earthdata login — it consumes
+> local LST GeoTIFFs (any source) and computes UHI intensity. To download
+> MODIS LST products, register a free account at
+> https://urs.earthdata.nasa.gov/ and use the `modis-lst-download` skill.
 
 ## Nodata Handling
 
